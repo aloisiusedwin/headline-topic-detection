@@ -30,7 +30,7 @@ headline-topic-detection/
 ├── training.ipynb        # Training LSTM & GRU + K-Fold
 ├── inference.ipynb       # Prediksi headline
 │
-├── models/               # Model tersimpan (opsional)
+├── models/               # Model tersimpan
 └── README.md
 ```
 
@@ -62,11 +62,6 @@ Notebook ini digunakan untuk:
 * Menampilkan distribusi kategori
 * Melakukan undersampling agar dataset seimbang
 * Menyimpan dataset hasil balancing
-
-Output:
-
-* Grafik distribusi kelas
-* `dataset_balanced.csv` (opsional)
 
 ---
 
@@ -124,7 +119,7 @@ predict("Harga BBM naik akibat tekanan global")
 Output:
 
 ```
-Kategori: Ekonomi
+Kategori: finance
 ```
 
 ---
@@ -140,7 +135,7 @@ Kategori: Ekonomi
 **Output (LSTM):**
 
 ```
-Ekonomi
+finance
 ```
 
 ---
@@ -170,13 +165,7 @@ Setiap model dievaluasi di tiap fold, kemudian dirata-ratakan.
 
 ## 📎 Rencana Pengembangan
 
-* Penambahan data augmentation berbasis NLP
-* Eksperimen dengan embedding pretrained (FastText/BERT-Indo)
-* Perluasan kategori berita
-* Fine-tuning model Transformer
+* Penambahan data augmentation (Perbandingan sebelum dan sesudah)
+* 4 skema evaluasi (LSTM & GRU dengan 2 Word Embedding)
 
 ---
-
-## 📄 Lisensi
-
-Proyek ini dapat digunakan untuk keperluan akademik dan penelitian.
