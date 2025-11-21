@@ -180,7 +180,3 @@ Setiap model dievaluasi di tiap fold, kemudian dirata-ratakan.
 ## 📄 Lisensi
 
 Proyek ini dapat digunakan untuk keperluan akademik dan penelitian.
-
----
-
-Jika ingin ditambah diagram arsitektur, tabel hasil eksperimen, atau badge GitHub, beri instruksi berikutnya.
