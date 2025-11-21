@@ -1,0 +1,58 @@
+# ============================
+# PYTHON & ENVIRONMENT
+# ============================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# ============================
+# ARTIFACTS (MODEL, TOKENIZER)
+# ============================
+artifacts/model_final/
+artifacts/vocab/
+artifacts/labels/
+artifacts/config/
+
+# Jika ingin menyimpan config.json, hapus baris ini:
+# artifacts/config/
+
+# ============================
+# NUMPY & BINARIES
+# ============================
+*.npy
+*.npz
+*.pkl
+*.pth
+*.pt
+*.bin
+
+# ============================
+# DATASET
+# ============================
+dataset/*.csv
+dataset/*.xlsx
+dataset/*.json
+
+# Jika ingin dataset ikut repo (tidak disarankan jika besar),
+# hapus baris di atas.
+
+# ============================
+# OS SPECIFIC
+# ============================
+.DS_Store
+Thumbs.db
+
+# ============================
+# IDE / EDITOR
+# ============================
+.vscode/
+*.code-workspace
