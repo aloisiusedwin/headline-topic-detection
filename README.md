@@ -1,25 +1,26 @@
-📰 Identifikasi Topik Berita Berdasarkan Judul
-Menggunakan Word Embedding (Word2Vec) dan Long Short-Term Memory (LSTM)
+# 📰 Identifikasi Topik Berita Berdasarkan Judul
 
-Repository ini berisi implementasi lengkap sistem klasifikasi topik berita berdasarkan judul berita dengan memanfaatkan Word Embedding berbasis Word2Vec Wikipedia Indonesia dan model LSTM/GRU. Pipeline dibangun modular melalui beberapa notebook terpisah yang mencakup proses dari pengecekan dataset hingga inference akhir.
+### Menggunakan Word Embedding (Word2Vec) dan Long Short-Term Memory (LSTM)
 
-📌 Fitur Utama
+Repository ini berisi implementasi lengkap sistem klasifikasi topik berita berdasarkan judul berita dengan memanfaatkan Word Embedding berbasis Word2Vec Wikipedia Indonesia serta model LSTM dan GRU. Pipeline dibangun modular, dimulai dari pengecekan dataset, preprocessing, pembuatan embedding matrix, training model, hingga inference.
 
-Word Embedding hasil pelatihan Word2Vec Wikipedia Indonesia
+---
 
-Integrasi embedding matrix ke model PyTorch
+## 📌 Fitur Utama
 
-Arsitektur LSTM dan GRU
+* Word Embedding hasil pelatihan Word2Vec Wikipedia Indonesia
+* Integrasi embedding matrix ke model PyTorch
+* Arsitektur LSTM dan GRU
+* Stratified K-Fold Cross Validation
+* Penanganan imbalance dataset (undersampling)
+* Pipeline modular: database → preprocess → embedding → training → inference
+* Pemilihan model terbaik otomatis berdasarkan metrik evaluasi
 
-Stratified K-Fold Cross Validation
+---
 
-Penanganan imbalance dataset (undersampling)
+## 🗂️ Struktur Repository
 
-Pipeline modular: database → preprocess → embedding → training → inference
-
-Pemilihan model terbaik otomatis (LSTM atau GRU)
-
-🗂️ Struktur Repository
+```
 headline-topic-detection/
 │
 ├── dataset/
@@ -42,107 +43,124 @@ headline-topic-detection/
 ├── inference.ipynb           # prediksi headline baru
 ├── train_embedding.py        # pelatihan Word2Vec Wikipedia
 └── README.md
-⚙️ Instalasi
+```
+
+---
+
+## ⚙️ Instalasi
 
 Gunakan Python 3.10 / 3.11.
 
+```bash
 pip install -r requirements.txt
+```
 
 Jika muncul error NumPy 2.x:
 
+```bash
 pip install "numpy<2"
-▶️ Pipeline Pengolahan
-1. database.ipynb — Pengecekan Data & Undersampling
+```
 
-Menampilkan distribusi kelas
+---
 
-Menyeimbangkan dataset (undersampling)
+## ▶️ Pipeline Pengolahan
 
-Menyimpan dataset final
+### 1. `database.ipynb` — Pengecekan Data & Undersampling
 
-2. preprocess.ipynb — Preprocessing & Encoding
+* Menampilkan distribusi kelas
+* Menyeimbangkan dataset melalui undersampling
+* Menyimpan dataset final hasil balancing
 
-Normalisasi teks (lowercase, regex)
+---
 
-Tokenisasi
+### 2. `preprocess.ipynb` — Preprocessing & Encoding
 
-Pembuatan vocabulary (word2idx)
-
-Padding
-
-Encoding label
+* Normalisasi teks (lowercase, regex)
+* Tokenisasi
+* Pembuatan vocabulary (`word2idx`)
+* Padding sequence
+* Encoding label
 
 Output utama:
 
-word2idx.pkl
+* `word2idx.pkl`
+* `label_encoder.pkl`
+* `X.npy`, `y.npy`
 
-label_encoder.pkl
+---
 
-X.npy, y.npy
+### 3. `embedding.ipynb` — Word2Vec Integration
 
-3. embedding.ipynb — Word2Vec Integration
+* Memuat model Word2Vec Wikipedia
+* Membangun embedding matrix sesuai vocabulary
+* Menyimpan `embedding_matrix.npy`
 
-Memuat Word2Vec Wikipedia
+---
 
-Membangun embedding matrix berdasarkan vocabulary
+### 4. `training.ipynb` — Training Model
 
-Menyimpan embedding_matrix.npy
-
-4. training.ipynb — Training Model
-
-Arsitektur LSTM dan GRU
-
-Stratified K-Fold
-
-Fine-tuning embedding
-
-Penyimpanan model terbaik
+* Arsitektur LSTM dan GRU
+* Stratified K-Fold Cross Validation
+* Fine-tuning embedding
+* Penyimpanan model terbaik
 
 Output:
 
-final_model.pth
+* `final_model.pth`
+* `config.json` (berisi jenis model terbaik: lstm/gru)
 
-config.json (berisi jenis model terbaik: lstm/gru)
+---
 
-5. inference.ipynb — Prediksi Headline Baru
+### 5. `inference.ipynb` — Prediksi Headline Baru
 
-Memuat config
+* Memuat konfigurasi model
+* Secara otomatis memilih model terbaik
+* Mengubah teks input menjadi token
+* Menghasilkan prediksi topik berita
 
-Memilih model terbaik (otomatis)
+---
 
-Encoding teks → prediksi kategori
+## 🧪 Contoh Input–Output
 
-🧪 Contoh Input–Output
+**Input:**
 
-Input:
-
+```
 "Putri KW Enggan Terbebani SEA Games dan World Tour Finals"
+```
 
-Output:
+**Output:**
 
+```
 sport
-🏗️ Arsitektur Model
+```
+
+---
+
+## 🏗️ Arsitektur Model
+
+```
 Input → Word2Vec Embedding → LSTM/GRU → Dense → Softmax
-📊 Evaluasi Model
+```
 
-Menggunakan Stratified K-Fold untuk menjaga distribusi label tiap fold.
+---
 
-Metrik:
+## 📊 Evaluasi Model
 
-Accuracy
+Evaluasi menggunakan **Stratified K-Fold** agar distribusi label tetap seimbang pada setiap fold.
 
-Precision (weighted)
+Metrik yang digunakan:
 
-Recall (weighted)
-
-F1-score (weighted)
+* Accuracy
+* Precision (weighted)
+* Recall (weighted)
+* F1-score (weighted)
 
 Model terbaik dipilih berdasarkan rata-rata F1-score.
 
-📎 Rencana Pengembangan
+---
 
-Penambahan data augmentation (EDA / synonym replacement / back-translation)
+## 📎 Rencana Pengembangan
 
-Pembandingan berbagai skema embedding (random vs Word2Vec)
-
-Ekspor model ke ONNX (?)
+* Penambahan data augmentation (EDA / synonym replacement / back-translation)
+* Perbandingan berbagai skema embedding (random vs Word2Vec)
+* Ekspor model ke ONNX
