@@ -11,11 +11,52 @@ __pycache__/
 env/
 venv/
 
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints/
+# Packages / wheel
+*.egg-info/
+dist/
+build/
 
-# Jika ingin dataset ikut repo (tidak disarankan jika besar),
-# hapus baris di atas.
+# ============================
+# JUPYTER NOTEBOOK
+# ============================
+.ipynb_checkpoints/
+*.ipynb_convert/
+
+# ============================
+# DATASETS ( Raw & Processed )
+# ============================
+# Jika dataset kecil & ingin ikut repo, hapus bagian ini
+dataset/*.csv
+dataset/*.xlsx
+dataset/*.json
+dataset/*.txt
+
+# ============================
+# ARTIFACTS / MODEL FILES
+# ============================
+# Model training output
+artifacts/model_final/*.pth
+artifacts/labels/
+artifacts/vocab/
+artifacts/embedding/
+
+# Numpy arrays hasil preprocess
+artifacts/dataset/*.npy
+
+# Embedding models (besar)
+embeddings/*.model
+embeddings/*.npy
+embeddings/*.bin
+embeddings/*.pt
+embeddings/*.vec
+
+# ============================
+# LOGGING
+# ============================
+*.log
+logs/
+tensorboard/
+runs/
 
 # ============================
 # OS SPECIFIC
@@ -28,3 +69,12 @@ Thumbs.db
 # ============================
 .vscode/
 *.code-workspace
+
+# PyCharm / JetBrains
+.idea/
+
+# ============================
+# MISC
+# ============================
+*.tmp
+*.lock
