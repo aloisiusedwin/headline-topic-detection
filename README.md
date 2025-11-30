@@ -1,20 +1,21 @@
 # 📰 Identifikasi Topik Berita Berdasarkan Judul
+### Menggunakan Word Embedding (Word2Vec), LSTM, dan GRU
 
-### Menggunakan Word Embedding (Word2Vec) dan Long Short-Term Memory (LSTM)
-
-Repository ini berisi implementasi lengkap sistem klasifikasi topik berita berdasarkan judul berita dengan memanfaatkan Word Embedding berbasis Word2Vec Wikipedia Indonesia serta model LSTM dan GRU. Pipeline dibangun modular, dimulai dari pengecekan dataset, preprocessing, pembuatan embedding matrix, training model, hingga inference.
+Repository ini berisi implementasi sistem klasifikasi topik berita berdasarkan judul (headline) menggunakan Word2Vec embedding Wikipedia Indonesia dan model LSTM/GRU dengan Stratified K-Fold cross validation.  
+Pipeline bersifat modular, mulai dari analisis dataset, preprocessing, embedding, augmentasi, training, hingga inference.
 
 ---
 
 ## 📌 Fitur Utama
 
-* Word Embedding hasil pelatihan Word2Vec Wikipedia Indonesia
-* Integrasi embedding matrix ke model PyTorch
-* Arsitektur LSTM dan GRU
-* Stratified K-Fold Cross Validation
-* Penanganan imbalance dataset (undersampling)
-* Pipeline modular: database → preprocess → embedding → training → inference
-* Pemilihan model terbaik otomatis berdasarkan metrik evaluasi
+- Word Embedding hasil pelatihan **Word2Vec Wikipedia Indonesia**
+- Integrasi embedding matrix ke dalam model PyTorch
+- Dua arsitektur model: **LSTM & GRU**
+- **Stratified K-Fold Cross Validation**
+- Penanganan imbalance dataset (undersampling)
+- **Data augmentation** berbasis paraphrase IndoT5 dan backtranslate
+- Pipeline lengkap: database → preprocess → embedding → augmentation → training → inference
+- Pemilihan model terbaik otomatis berdasarkan metrik F1-score
 
 ---
 
@@ -24,22 +25,25 @@ Repository ini berisi implementasi lengkap sistem klasifikasi topik berita berda
 headline-topic-detection/
 │
 ├── dataset/
-│   └── indonesian-news-title.csv
+│   ├── indonesian-news-title.csv
+│   ├── indonesian-news-title-balanced.csv
+│   └── indonesian-news-title-augmented.csv
 │
 ├── artifacts/
 │   ├── vocab/                # word2idx.pkl
-│   ├── labels/               # label encoder
-│   ├── embedding/            # embedding matrix, dump wiki, extract text
-│   ├── config/               # konfigurasi model akhir
-│   └── model_final/          # model terbaik
+│   ├── labels/               # label_encoder.pkl
+│   ├── embedding/            # embedding_matrix.npy + wiki dump
+│   ├── config/               # konfigurasi model terbaik
+│   └── model_final/          # final_model.pth
 │
 ├── embeddings/
-│   └── idwiki_word2vec.model (+ .npy)
+│   └── idwiki_word2vec.model (+ files .npy)
 │
-├── database.ipynb            # pengecekan dataset + undersampling
-├── preprocess.ipynb          # preprocessing & encoding token
-├── embedding.ipynb           # membuat embedding matrix
-├── training.ipynb            # training LSTM & GRU + K-Fold
+├── augmentation.ipynb        # pembuatan data augmentasi
+├── database.ipynb            # analisis dataset & undersampling
+├── preprocess.ipynb          # normalisasi & encoding token
+├── embedding.ipynb           # pembuatan embedding matrix
+├── training.ipynb            # training LSTM & GRU (K-Fold)
 ├── inference.ipynb           # prediksi headline baru
 ├── train_embedding.py        # pelatihan Word2Vec Wikipedia
 └── README.md
@@ -49,13 +53,13 @@ headline-topic-detection/
 
 ## ⚙️ Instalasi
 
-Gunakan Python 3.10 / 3.11.
+Gunakan Python **3.10 atau 3.11**.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Jika muncul error NumPy 2.x:
+Jika NumPy versi terbaru membuat error:
 
 ```bash
 pip install "numpy<2"
@@ -63,72 +67,110 @@ pip install "numpy<2"
 
 ---
 
-## ▶️ Pipeline Pengolahan
+# ▶️ Pipeline Pengolahan
 
-### 1. `database.ipynb` — Pengecekan Data & Undersampling
+Flowchart pipeline :
 
-* Menampilkan distribusi kelas
-* Menyeimbangkan dataset melalui undersampling
-* Menyimpan dataset final hasil balancing
-
----
-
-### 2. `preprocess.ipynb` — Preprocessing & Encoding
-
-* Normalisasi teks (lowercase, regex)
-* Tokenisasi
-* Pembuatan vocabulary (`word2idx`)
-* Padding sequence
-* Encoding label
-
-Output utama:
-
-* `word2idx.pkl`
-* `label_encoder.pkl`
-* `X.npy`, `y.npy`
+```mermaid
+flowchart TD
+    A[Dataset Asli] --> B[Analisis & Balancing]
+    B --> C[Preprocessing]
+    C --> D[Tokenisasi & Vocabulary]
+    D --> E[Word2Vec Embedding Matrix]
+    E --> F[Augmentasi Dataset]
+    F --> G[Training LSTM & GRU (K-Fold)]
+    G --> H[Evaluasi & Pemilihan Model Terbaik]
+    H --> I[Inference]
+```
 
 ---
 
-### 3. `embedding.ipynb` — Word2Vec Integration
+# 1️⃣ `database.ipynb` — Analisis & Undersampling
 
-* Memuat model Word2Vec Wikipedia
-* Membangun embedding matrix sesuai vocabulary
-* Menyimpan `embedding_matrix.npy`
+- Menampilkan distribusi kelas awal
+- Menangani imbalance dengan undersampling
+- Menyimpan dataset: `indonesian-news-title-balanced.csv`
 
 ---
 
-### 4. `training.ipynb` — Training Model
+# 2️⃣ `preprocess.ipynb` — Preprocessing & Encoding
 
-* Arsitektur LSTM dan GRU
-* Stratified K-Fold Cross Validation
-* Fine-tuning embedding
-* Penyimpanan model terbaik
+Fungsi:
+
+- Lowercase & normalisasi teks
+- Tokenisasi
+- Pembuatan vocabulary (`word2idx.pkl`)
+- Padding
+- Encoding label (`label_encoder.pkl`)
 
 Output:
 
-* `final_model.pth`
-* `config.json` (berisi jenis model terbaik: lstm/gru)
+```
+X.npy
+y.npy
+word2idx.pkl
+label_encoder.pkl
+```
 
 ---
 
-### 5. `inference.ipynb` — Prediksi Headline Baru
+# 3️⃣ `embedding.ipynb` — Word2Vec Integration
 
-* Memuat konfigurasi model
-* Secara otomatis memilih model terbaik
-* Mengubah teks input menjadi token
-* Menghasilkan prediksi topik berita
+- Memuat model Word2Vec dari folder `embeddings/`
+- Membuat embedding matrix (300 dimensi)
+- Menyimpan `embedding_matrix.npy`
 
 ---
 
-## 🧪 Contoh Input–Output
+# 4️⃣ `augmentation.ipynb` — Data Augmentation
 
-**Input:**
+Metode augmentasi:
+
+- **Paraphrase IndoT5-base-paraphrase**
+- **Back-Translate opus-mt-id-en dan opus-mt-en-id**
+
+Contoh:
 
 ```
-"Putri KW Enggan Terbebani SEA Games dan World Tour Finals"
+Original     : Kepala Desainer Mobil Hyundai Mengundurkan Diri
+Paraphrase   : Kepala arsitek untuk mobil Hyundai mengundurkan diri 
 ```
 
-**Output:**
+Dataset yang dihasilkan:  
+`indonesian-news-title-augmented.csv`
+
+---
+
+# 5️⃣ `training.ipynb` — Training LSTM & GRU
+
+Fitur:
+
+- **Stratified K-Fold** (k = 5)
+- Fine-tuning embedding matrix
+- Arsitektur LSTM dan GRU diuji secara paralel
+- Dipilih model terbaik berdasarkan macro F1-score
+- Disimpan dalam folder `artifacts/model_final/`
+
+Output:
+
+```
+final_model.pth
+config.json
+```
+
+`config.json` menentukan apakah model terbaik adalah LSTM atau GRU.
+
+---
+
+# 6️⃣ `inference.ipynb` — Prediksi Headline Baru
+
+Contoh penggunaan:
+
+```python
+predict("Putri KW Enggan Terbebani SEA Games dan World Tour Finals")
+```
+
+Output:
 
 ```
 sport
@@ -136,31 +178,50 @@ sport
 
 ---
 
-## 🏗️ Arsitektur Model
+# 📊 Evaluasi Model
+
+## Distribusi Dataset Balanced
 
 ```
-Input → Word2Vec Embedding → LSTM/GRU → Dense → Softmax
+Setiap kategori = 2436 sampel
+Total dataset  = 21.924 sampel
+```
+
+## Distribusi Dataset Balanced-Augmented
+
+```
+Setiap kategori = 9744 sampel
+Total dataset  = 87.696 sampel
 ```
 
 ---
 
-## 📊 Evaluasi Model
+## Tabel Hasil Eksperimen
 
-Evaluasi menggunakan **Stratified K-Fold** agar distribusi label tetap seimbang pada setiap fold.
+```
++-----------------+-----------+-----------+
+| Dataset         | LSTM (F1) | GRU (F1)  |
++-----------------+-----------+-----------+
+| Non-Augmented   |   0.817   |   0.814   |
+| Augmented       |   0.926   |   0.927   |
++-----------------+-----------+-----------+
+```
+---
 
-Metrik yang digunakan:
+# 🏗️ Arsitektur Model
 
-* Accuracy
-* Precision (weighted)
-* Recall (weighted)
-* F1-score (weighted)
-
-Model terbaik dipilih berdasarkan rata-rata F1-score.
+```
+Input → Word2Vec Embedding → LSTM/GRU → Dense Layer → Softmax
+```
 
 ---
 
-## 📎 Rencana Pengembangan
+# 📎 Peluang Pengembangan
 
-* Penambahan data augmentation (EDA / synonym replacement / back-translation)
-* Perbandingan berbagai skema embedding (random vs Word2Vec)
-* Ekspor model ke ONNX
+- Menambah teknik augmentasi lain (EDA, contextual augmentation)
+- Membandingkan embedding lain (FastText, IndoBERT)
+- Hyperparameter tuning otomatis (Optuna)
+- Menyediakan model dalam format ONNX
+
+---
+
