@@ -4,5 +4,5 @@
     "vocab_size": 19560,
     "embedding_dim": 128,
     "hidden_size": 128,
-    "best_model_type": "gru"
+    "best_model_type": "lstm"
 }
