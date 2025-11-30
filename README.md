@@ -1,19 +1,20 @@
 # 📰 Identifikasi Topik Berita Berdasarkan Judul
 
-### Menggunakan Word Embedding dan Long Short-Term Memory (LSTM)
+### Menggunakan Word Embedding (Word2Vec) dan Long Short-Term Memory (LSTM)
 
-Repository ini berisi implementasi sistem klasifikasi topik berita berdasarkan judul (headline). Model utama menggunakan Word Embedding + LSTM, dengan perbandingan GRU sebagai baseline. Proyek tersusun modular dalam beberapa notebook yang merepresentasikan pipeline penuh: pengecekan database, preprocessing, training, dan inference.
+Repository ini berisi implementasi lengkap sistem klasifikasi topik berita berdasarkan judul berita dengan memanfaatkan Word Embedding berbasis Word2Vec Wikipedia Indonesia serta model LSTM dan GRU. Pipeline dibangun modular, dimulai dari pengecekan dataset, preprocessing, pembuatan embedding matrix, training model, hingga inference.
 
 ---
 
 ## 📌 Fitur Utama
 
-* Klasifikasi 9 kategori topik berita
-* Word Embedding custom (dilatih dari awal)
+* Word Embedding hasil pelatihan Word2Vec Wikipedia Indonesia
+* Integrasi embedding matrix ke model PyTorch
 * Arsitektur LSTM dan GRU
-* K-Fold Cross Validation
-* Penanganan dataset imbalance melalui undersampling
-* Notebook modular dan mudah direproduksi
+* Stratified K-Fold Cross Validation
+* Penanganan imbalance dataset (undersampling)
+* Pipeline modular: database → preprocess → embedding → training → inference
+* Pemilihan model terbaik otomatis berdasarkan metrik evaluasi
 
 ---
 
@@ -25,12 +26,22 @@ headline-topic-detection/
 ├── dataset/
 │   └── indonesian-news-title.csv
 │
-├── database.ipynb        # Exploratory data + undersampling
-├── preprocess.ipynb      # Cleaning, tokenizing, encoding
-├── training.ipynb        # Training LSTM & GRU + K-Fold
-├── inference.ipynb       # Prediksi headline
+├── artifacts/
+│   ├── vocab/                # word2idx.pkl
+│   ├── labels/               # label encoder
+│   ├── embedding/            # embedding matrix, dump wiki, extract text
+│   ├── config/               # konfigurasi model akhir
+│   └── model_final/          # model terbaik
 │
-├── models/               # Model tersimpan
+├── embeddings/
+│   └── idwiki_word2vec.model (+ .npy)
+│
+├── database.ipynb            # pengecekan dataset + undersampling
+├── preprocess.ipynb          # preprocessing & encoding token
+├── embedding.ipynb           # membuat embedding matrix
+├── training.ipynb            # training LSTM & GRU + K-Fold
+├── inference.ipynb           # prediksi headline baru
+├── train_embedding.py        # pelatihan Word2Vec Wikipedia
 └── README.md
 ```
 
@@ -38,89 +49,74 @@ headline-topic-detection/
 
 ## ⚙️ Instalasi
 
-Gunakan Python 3.10 / 3.11. Disarankan pakai virtual environment.
+Gunakan Python 3.10 / 3.11.
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
 Jika muncul error NumPy 2.x:
 
-```
+```bash
 pip install "numpy<2"
 ```
 
 ---
 
-## ▶️ Cara Menjalankan Pipeline
+## ▶️ Pipeline Pengolahan
 
-### **1) database.ipynb — Cek Data & Undersampling**
+### 1. `database.ipynb` — Pengecekan Data & Undersampling
 
-Notebook ini digunakan untuk:
-
-* Membaca dataset asli
-* Menampilkan distribusi kategori
-* Melakukan undersampling agar dataset seimbang
-* Menyimpan dataset hasil balancing
+* Menampilkan distribusi kelas
+* Menyeimbangkan dataset melalui undersampling
+* Menyimpan dataset final hasil balancing
 
 ---
 
-### **2) preprocess.ipynb — Preprocessing & Encoding**
+### 2. `preprocess.ipynb` — Preprocessing & Encoding
 
-Tahap-tahap preprocessing:
-
-* Lowercase dan normalisasi karakter
+* Normalisasi teks (lowercase, regex)
 * Tokenisasi
-* Pembuatan vocabulary (word2idx)
+* Pembuatan vocabulary (`word2idx`)
 * Padding sequence
-* Encoding label menjadi angka
+* Encoding label
 
-Output:
+Output utama:
 
-* `X.npy` — tokenized padded input
-* `y.npy` — encoded label
-* `word2idx.json`
-
----
-
-### **3) training.ipynb — Training Model (LSTM & GRU)**
-
-Notebook ini berisi:
-
-* Dataloader
-* Definisi arsitektur LSTM dan GRU
-* Loop training
-* K-Fold Cross Validation
-* Perhitungan metrik:
-
-  * Accuracy
-  * Precision (weighted)
-  * Recall (weighted)
-  * F1-score (weighted)
-
-Output:
-
-* `lstm_model_foldX.pt`
-* `gru_model_foldX.pt`
-* Rangkuman hasil evaluasi
+* `word2idx.pkl`
+* `label_encoder.pkl`
+* `X.npy`, `y.npy`
 
 ---
 
-### **4) inference.ipynb — Prediksi Headline Baru**
+### 3. `embedding.ipynb` — Word2Vec Integration
 
-Digunakan untuk memprediksi topik dari judul berita.
+* Memuat model Word2Vec Wikipedia
+* Membangun embedding matrix sesuai vocabulary
+* Menyimpan `embedding_matrix.npy`
 
-Contoh penggunaan:
+---
 
-```
-predict("Harga BBM naik akibat tekanan global")
-```
+### 4. `training.ipynb` — Training Model
+
+* Arsitektur LSTM dan GRU
+* Stratified K-Fold Cross Validation
+* Fine-tuning embedding
+* Penyimpanan model terbaik
 
 Output:
 
-```
-Kategori: finance
-```
+* `final_model.pth`
+* `config.json` (berisi jenis model terbaik: lstm/gru)
+
+---
+
+### 5. `inference.ipynb` — Prediksi Headline Baru
+
+* Memuat konfigurasi model
+* Secara otomatis memilih model terbaik
+* Mengubah teks input menjadi token
+* Menghasilkan prediksi topik berita
 
 ---
 
@@ -129,28 +125,28 @@ Kategori: finance
 **Input:**
 
 ```
-"Rupiah melemah terhadap dolar AS akibat sentimen global"
+"Putri KW Enggan Terbebani SEA Games dan World Tour Finals"
 ```
 
-**Output (LSTM):**
+**Output:**
 
 ```
-finance
-```
-
----
-
-## 🏗️ Arsitektur Model (Ringkas)
-
-```
-Input text → Embedding layer → LSTM → Dense layer → Softmax → Output kelas
+sport
 ```
 
 ---
 
-## 📊 Evaluasi
+## 🏗️ Arsitektur Model
 
-Evaluasi dilakukan menggunakan **Stratified K-Fold** agar distribusi label tiap fold tetap seimbang.
+```
+Input → Word2Vec Embedding → LSTM/GRU → Dense → Softmax
+```
+
+---
+
+## 📊 Evaluasi Model
+
+Evaluasi menggunakan **Stratified K-Fold** agar distribusi label tetap seimbang pada setiap fold.
 
 Metrik yang digunakan:
 
@@ -159,13 +155,12 @@ Metrik yang digunakan:
 * Recall (weighted)
 * F1-score (weighted)
 
-Setiap model dievaluasi di tiap fold, kemudian dirata-ratakan.
+Model terbaik dipilih berdasarkan rata-rata F1-score.
 
 ---
 
 ## 📎 Rencana Pengembangan
 
-* Penambahan data augmentation (Perbandingan sebelum dan sesudah)
-* 4 skema evaluasi (LSTM & GRU dengan 2 Word Embedding)
-
----
+* Penambahan data augmentation (EDA / synonym replacement / back-translation)
+* Perbandingan berbagai skema embedding (random vs Word2Vec)
+* Ekspor model ke ONNX
