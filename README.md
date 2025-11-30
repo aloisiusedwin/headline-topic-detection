@@ -73,13 +73,13 @@ Flowchart pipeline :
 
 ```mermaid
 flowchart TD
-    A[Dataset Asli] --> B[Analisis & Balancing]
+    A[Dataset Asli] --> B[Analisis \& Balancing]
     B --> C[Preprocessing]
-    C --> D[Tokenisasi & Vocabulary]
+    C --> D[Tokenisasi \& Vocabulary]
     D --> E[Word2Vec Embedding Matrix]
     E --> F[Augmentasi Dataset]
-    F --> G[Training LSTM & GRU (K-Fold)]
-    G --> H[Evaluasi & Pemilihan Model Terbaik]
+    F --> G[Training LSTM \& GRU (K-Fold)]
+    G --> H[Evaluasi \& Pemilihan Model Terbaik]
     H --> I[Inference]
 ```
 
