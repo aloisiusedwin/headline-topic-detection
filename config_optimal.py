@@ -25,10 +25,13 @@ EMBEDDING_DIR = ARTIFACTS_DIR / "embedding"
 MODEL_DIR = ARTIFACTS_DIR / "model_final"
 CHECKPOINT_DIR = ARTIFACTS_DIR / "checkpoints"
 RESULTS_DIR = ARTIFACTS_DIR / "results"
+PLOTS_DIR = ARTIFACTS_DIR / "plots"  # ✅ NEW: Visualization plots
+LOGS_DIR = ARTIFACTS_DIR / "logs"    # ✅ NEW: Runtime logs
 
 # Create all directories
 for dir_path in [VOCAB_DIR, LABELS_DIR, CONFIG_DIR, DATASET_ARTIFACTS_DIR, 
-                 EMBEDDING_DIR, MODEL_DIR, CHECKPOINT_DIR, RESULTS_DIR]:
+                 EMBEDDING_DIR, MODEL_DIR, CHECKPOINT_DIR, RESULTS_DIR,
+                 PLOTS_DIR, LOGS_DIR]:  # ✅ Added PLOTS_DIR and LOGS_DIR
     dir_path.mkdir(parents=True, exist_ok=True)
 
 
@@ -138,6 +141,17 @@ AVERAGE = "macro"  # Macro-averaged metrics
 SAVE_RESULTS = True
 SAVE_PLOTS = True
 VERBOSE = True
+
+# Plotting configuration
+AUTO_PLOT = True  # ✅ NEW: Automatically generate plots during training
+PLOT_DPI = 300  # High quality plots
+PLOT_STYLE = 'seaborn-v0_8-darkgrid'  # Plot style
+SAVE_PLOT_FORMATS = ['png', 'pdf']  # Save formats
+
+# Runtime logging
+LOG_RUNTIME = True  # ✅ NEW: Log training runtime statistics
+LOG_MEMORY = True  # Log GPU memory usage
+LOG_INTERVAL = 1  # Log every N epochs
 
 
 # ============================================================================

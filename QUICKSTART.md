@@ -6,12 +6,17 @@
 # 1. Prepare data
 python prepare_data_optimal.py
 
-# 2. Augment (opsional, ~1.6 jam)
-python augment_data_optimal.py
+# 2. Train with auto-plotting & runtime logging
+python train_with_plots.py
 
-# 3. Train
-jupyter notebook training_improved.ipynb
+# 3. Check results in artifacts/plots/
 ```
+
+**NEW FEATURES:**
+- ✅ **Auto-generate graphs** untuk setiap fold dan overall
+- ✅ **Runtime logging** dengan timestamps dan memory usage
+- ✅ **Multi-format export** (PNG, PDF)
+- ✅ **Automatic saving** ke folder `artifacts/plots/` dan `artifacts/logs/`
 
 ---
 
@@ -91,6 +96,57 @@ jupyter notebook training_improved.ipynb
 | **Data Leakage** | ❌ Aug before split | ✅ Aug after split | Valid results |
 | **Code Quality** | Scattered notebooks | Modular scripts | Maintainable |
 | **Configuration** | Hardcoded values | Centralized config | Easy tuning |
+
+---
+
+## 🎨 Auto-Generated Visualizations
+
+### **Training menghasilkan 4 jenis plot otomatis:**
+
+1. **Per-Fold Training History** (`fold{N}_history.png`)
+   - Train/Val loss curves
+   - Validation metrics (F1, accuracy, precision, recall)
+   - Saved untuk setiap fold
+
+2. **K-Fold Results Comparison** (`kfold_results.png`)
+   - Bar chart perbandingan semua fold
+   - Mean lines untuk setiap metric
+   - Value labels di setiap bar
+
+## 🛠️ How to Modify Settings
+
+### **1. Change plot settings:**
+Edit `config_optimal.py`:
+```python
+AUTO_PLOT = True           # Set to False to disable auto-plotting
+PLOT_DPI = 300            # Change to 150 or 600
+SAVE_PLOT_FORMATS = ['png', 'pdf']  # Add 'svg' if needed
+LOG_RUNTIME = True        # Set to False to disable runtime logging
+```
+
+### **2. Change model architecture:**, val F1, val accuracy
+   - Easy comparison antar folds
+
+4. **Runtime Logs** (`runtime.json`)
+   - Start/end timestamps
+   - Total training time
+   - Per-epoch timing
+   - Memory usage (GPU)
+   - Best epoch info
+
+### **Example output structure:**
+```
+artifacts/
+├── plots/
+│   ├── training_20241204_143022_fold1_history.png
+│   ├── training_20241204_143022_fold1_history.pdf
+│   ├── training_20241204_143022_fold2_history.png
+│   ├── training_20241204_143022_kfold_results.png
+│   └── training_20241204_143022_all_folds_comparison.png
+│
+└── logs/
+    └── training_20241204_143022_runtime.json
+```
 
 ---
 
@@ -196,15 +252,6 @@ VAL_SIZE = 0.2    # Change to 0.15 or 0.25
 ## 🎓 Best Practices
 
 1. **Always set seed:** `set_seed(42)` for reproducibility
-2. **Monitor both losses:** Watch train & val loss curves
-3. **Save checkpoints:** Use best val F1, not last epoch
-4. **Report statistics:** Always report mean ± std across folds
-5. **Validate on original:** When using augmentation, test on original data
-6. **Use version control:** Commit config changes with git
-7. **Document experiments:** Note what config changes you tried
-
----
-
 ## 📞 Quick Commands Reference
 
 ```bash
@@ -217,8 +264,23 @@ python utils_optimal.py
 # Prepare data (force rebuild)
 python prepare_data_optimal.py
 
+# Run training with plots
+python train_with_plots.py
+
 # Run augmentation
 python augment_data_optimal.py
+
+# Check GPU availability
+python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}')"
+
+# View runtime log
+python -c "import json; print(json.dumps(json.load(open('artifacts/logs/training_*_runtime.json')), indent=2))"
+
+# Check disk space
+python -c "from pathlib import Path; import shutil; print(f'Free space: {shutil.disk_usage(\".\")[2] / (1024**3):.1f} GB')"
+```
+
+---hon augment_data_optimal.py
 
 # Check GPU availability
 python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}')"
